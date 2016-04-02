@@ -1,5 +1,6 @@
 var loginuser;
 var loginname;
+var groups = [];
 
 /*Add user's new post*/
 $("#tweetPost").submit(function(event){
@@ -7,10 +8,12 @@ $("#tweetPost").submit(function(event){
     event.preventDefault();             /**Ketul**/
 
     var tweet=$("#tweet").val();
-
+    var group = $("#grpId").text();
+    console.log(group);
     var data={"tweet":tweet,
     "username":loginname,
-    "userid":loginuser};
+    "userid":loginuser,
+    "group": group};
 
     $.ajax({
         url: "http://localhost:8000/tweet",
@@ -32,39 +35,43 @@ $("#tweetPost").submit(function(event){
 });
 
 /*load all tweets*/
-function loadTweets()
+function loadTweets(grpId)
 {
     $.ajax({
         url: "http://localhost:8000/loadTweets",     /*Ketul*/
         type: "GET",
         dataType:"json",
         success: function (postData) {
-
+            $("div#posts").html("");
+            $(".userArea").removeClass("hide");
             loginuser+="";
             postData.forEach(function(postData) {
-                var likearr=postData.like;
-                upcount=likearr.length;
+                if(postData.group == grpId && postData.approved == false) {
+                    var likearr=postData.like;
+                    upcount=likearr.length;
 
-                var dislikearr=postData.dislike;
-                dcount=dislikearr.length;
+                        var dislikearr=postData.dislike;
+                        dcount=dislikearr.length;
 
-                if(likearr.indexOf(loginuser)!==-1)
-                {
-                    console.log("up");
-                    var updown="up";
+                        if(likearr.indexOf(loginuser)!==-1)
+                        {
+                            console.log("up");
+                            var updown="up";
+                        }
+                        else if(dislikearr.indexOf(loginuser)!==-1)
+                        {
+                            console.log("down");
+                            var updown="down";
+                        }
+                        else
+                        {
+                            console.log("no. Loginuser: "+loginuser+" Array up: "+likearr+" array down: "+dislikearr);
+                            var updown="no";
+                        }
+                        displayName(postData.id,postData.content,postData.user,postData.date,upcount,dcount,updown);
                 }
-                else if(dislikearr.indexOf(loginuser)!==-1)
-                {
-                    console.log("down");
-                    var updown="down";
-                }
-                else
-                {
-                    console.log("no. Loginuser: "+loginuser+" Array up: "+likearr+" array down: "+dislikearr);
-                    var updown="no";
-                }
-                displayName(postData.id,postData.content,postData.user,postData.date,upcount,dcount,updown);
             });
+
         }
     });
 }
@@ -88,6 +95,7 @@ function displayName(id, tweet, user, date, up, down, upNoDown){
         label1 = labelUp;
         label2 = labelDownActive;
     }
+
     /*not yet upvoted/downvoted.Both buttons unselected*/
     else{
         label1 = labelUp;
@@ -156,6 +164,9 @@ $("#posts").delegate("label", "click",function(e) {
                     postData.like=likearr;
                     postData.dislike=dislikearr;
 
+                    if(up == 3){
+                        postData.approved = true;
+                    }
                     updatePost(postData);
 
                 }
@@ -179,14 +190,12 @@ $("#posts").delegate("label", "click",function(e) {
                     postData.like=likearr;
                     postData.dislike=dislikearr;
 
-                    if(up == 3){
-                        postData.approved = true;
-                    }
                     updatePost(postData);
 
                 }
             }
         });
+
 function updatePost(data)
 {
    $.ajax({
@@ -196,11 +205,11 @@ function updatePost(data)
         data:JSON.stringify(data),
         dataType: "json",
         success: function (updatedData) {
-            var count=(updatedData.like).length;
-            if(count===3)
+            /*var count=(updatedData.like).length;*/
+            console.log("Approved: "+updatedData.approved);
+            if(updatedData.approved == true)
             {
                 postTweet(updatedData.content);
-
             }
         }
     });
@@ -221,7 +230,7 @@ function postTweet(tweet)
         data:JSON.stringify(data),
         dataType: "json",
         success: function (updatedData) {
-            $div.html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
+            $("div#"+updatedData.id).html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
              "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
              "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
              "Tweet posted to your account. </div>");
@@ -269,16 +278,18 @@ $("#loginModal").delegate("#login",'click', function (event) {
                 $("#loginModal").modal("hide");
                 loginname=data.user_name;
                 loginuser=data.id;
+                groups = data.member_of;
 
                 $("a#user").text(loginname);
                 $("li.dropdown").removeClass("hide");
                 $(".firstTask").addClass("hide");
                 $(".loginDone").removeClass("hide");
-                $(".userArea").removeClass("hide");
+                /*$(".userArea").removeClass("hide");*/
+                $(".heading").removeClass("hide");
 
                 $("button[type=submit]").prop('disabled',true);
 
-                loadTweets();
+                loadgroups();
 
             },
             error: function(data){
@@ -288,6 +299,39 @@ $("#loginModal").delegate("#login",'click', function (event) {
             }
         });
     }
+});
+
+/*Load user
+*GIVING ERROR THE FIRST TIME WEBSITE IS ACCESSED - NEED TO FIX*/
+function loadgroups(){
+    $.ajax({
+        url: "http://localhost:8000/getGroups",
+        type: "GET",
+        dataType:"json",
+        success: function (data) {
+            var grpIdcheck = "";
+            data.forEach(function(data){
+                grpIdcheck += data.id;
+                console.log("group id "+grpIdcheck);
+                if(groups.indexOf(grpIdcheck)!==-1){
+                    $("ul.dropdown-menu").append("<li class=\"grpNames\"><a href=\"#\">"+data.group_name+"</a></li>" +
+                        "<span class=\"grpId hide\">"+data.id+"</span>");
+                }
+                grpIdcheck = "";
+            });
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+}
+
+/*Load tweets from a specific group when user selects the group from the list*/
+$("ul.dropdown-menu").delegate(".grpNames", "click", function(){
+
+    var grpId = $(this).next("span").text();
+    $("#headings").text($(this).text()).append("<span id=\"grpId\" class=\"hide\">"+grpId+"</span>");
+    loadTweets(grpId);
 });
 
 /*Disable and enable submit button by checking the textarea contents*/
@@ -341,7 +385,7 @@ $("#newSignUp").on("click", function(event){
             "user_name": newUser,
             "password": newPass
         };
-        /*$.ajax({
+        $.ajax({
          url: "http://localhost:8000/register",
          type: "POST",
          data: data,
@@ -350,7 +394,7 @@ $("#newSignUp").on("click", function(event){
          console.log("new user created. "+data.id);
          $("#signupModal").modal("hide");
          }
-         });*/
+         });
     }
 
 });
@@ -358,23 +402,92 @@ $("#newSignUp").on("click", function(event){
 /*Handle new group creation*/
 $("#createGrp").on("click", function(event){
     event.preventDefault();
-    var users = [], grpName, twitterAcnt;
-    $("li.tag-cloud").each(function() { users.push($(this).text()) });
+    var grpName, twitterAcnt;
+
     grpName = $("#groupName").val();
     twitterAcnt = $("#twitter").val();
     if(!grpName){
         err("#groupName");
-    }
-    else if(users.length==0){
-        $(".divMembers").addClass("has-error");
-        $(".members").fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
     }
     else if(!twitterAcnt){
         err("#twitter");
     }
     else {
 
+        $("#groupModal").modal("hide");
+        $("#stack2").modal("show");
+
+        $.ajax({
+            url: "http://localhost:8000/createGroup",
+            type: "POST",
+            data: {
+                group_name: grpName,
+                twitterScr: twitterAcnt
+            },
+            dataType:"json",
+            success: function (postData) {
+                console.log("Group id: " + postData.id);
+                $("span#groupId").text(postData.id);
+                postData.id+="";
+                groups.push(postData.id);
+                console.log(groups + " id:"+ loginuser);
+                updateAdmin(loginuser, groups);
+                $("ul.dropdown-menu").append("<li class=\"grpNames\"><a href=\"#\">"+grpName+"</a></li>" +
+                    "<span class=\"grpId hide\">"+postData.id+"</span>");
+            }
+        });
+
+
     }
+});
+
+/*Add group to the group list of the user who created the group*/
+function updateAdmin(user_id,newGroup){
+    console.log("newGroup: "+newGroup);
+    $.ajax({
+        url: "http://localhost:8000/adminUser",
+        type: "POST",
+        data: JSON.stringify({
+            user_id: user_id,
+            groups : newGroup
+        }),
+        dataType: "json",
+        contentType: "application/json",
+        success: function(data){
+            console.log("Admin profile success.");
+        },
+        error: function(error){
+            console.log(error);
+        }
+    });
+}
+
+/*Look for the li.tag-cloud element to be added when the logged-in user adds users to the group
+* and add those to the group*/
+jQuery(document).ready(function($) {
+    $("li.tag-cloud").initialize(function(){
+        var user = $(this).text();
+        var group = $("span#groupId").text();
+        $.ajax({
+            url: "http://localhost:8000/getUser",
+            method: "POST",
+            data:{
+                member: user,
+                group: group
+            },
+            dataType: "json",
+            success: function(data){
+                console.log(data);
+            },
+            error: function(error){
+                console.log(error);
+                $("div.forGrp").append("<div class=\"alert alert-danger alert-dismissible\" role=\"alert\"> " +
+                    "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
+                    "<span aria-hidden=\"true\">&times;</span></button> <strong>Alert!</strong> " +
+                    "Could not find users: "+user+"</div>");
+            }
+        })
+    });
 });
 
 /*Logout*/

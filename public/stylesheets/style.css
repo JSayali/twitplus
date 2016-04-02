@@ -11,9 +11,8 @@
     margin: 0;
 }
 .alert {
-    height: 50px;
+    display:inline-block;
     font-size: medium;
-    padding-bottom:5px;
 }
 .post-title {
     text-overflow: clip;
