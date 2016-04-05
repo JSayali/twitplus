@@ -20,7 +20,7 @@ app.get('/checkSession',function(req,res) {
 
     if(typeof sess.user != 'undefined')
     {
-        var data=sess.user;
+        var data = sess;
         res.send(data);
     }
     else
@@ -33,9 +33,9 @@ app.get('/checkSession',function(req,res) {
 app.post("/register", function (req, res) {
     request({url: "http://localhost:3000/users?user_name="+req.body.user_name},
         function(error, response, body){
-            console.log("in function request");
+
             var user = JSON.parse(body);
-            console.log(user.user_name);
+
             if(user[0] == undefined){
                 var data = {
                     "user_name": req.body.user_name,
@@ -125,8 +125,10 @@ app.post('/login',function(req,res){
                     {
                         flag=true;
                         sess.user = data[i];
+                        sess.members = data.length;
                         sess.save();
-                        res.send(data[i]);
+
+                        res.send({data: data[i], total: data.length});
                     }
                 }
                 if(flag==false)
@@ -157,33 +159,25 @@ app.get("/logout",function(req,res){
 
 app.post("/postTwitter",function(req,res){
 
-        var tweet=req.body.tweet;
-
-        request('http://localhost:3000/twitter', function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-
-            var config=JSON.parse(body);
-            config=config[0];
+    var tweet=req.body.tweet;
+        console.log("tweet"+tweet);
 
             var client = new Twitter({
-                consumer_key: config.consumer_key,
-                consumer_secret:config.consumer_secret,
-                access_token_key:config.access_token_key,
-                access_token_secret:config.access_token_secret
+                consumer_key: "wdupZpyaeLjCvqhsrJsDp20ix",
+                consumer_secret:'xsAzRqdU32W59Ow2OjhAtyex7WozQwWClc1Vf7bOYoIYTKHHYs',
+                access_token_key:'706613428790566912-BYASC0htSA2V2bcB2Ps4OmQdpwj3s40',
+                access_token_secret:'L8SL9Na2RwZ6c12r4HlxVJkXQnC5CqHn60GQjoWxYINmT'
             });
 
             var params = {screen_name: 'cpsc473'};
 
             client.post('statuses/update', {status: tweet},  function(error, tweet, response){
                 if(error) throw error;
-                return;
+                console.log(tweet);  // Tweet body.
+                console.log(response);  // Raw response object.
+                res.send({"success": true});
             });
-        }
-            else {
-            console.log(error);
-        }
 
-        })
 });
 
 function getDate(){

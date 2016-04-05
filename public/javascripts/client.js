@@ -1,10 +1,18 @@
 var session;
+var limit;
 
 $(document).ready(function(){
     $.get( "http://localhost:8000/checkSession", function( data ) {
-       if(data!=="new"){
-           session=data;
-           $("a#user").append(" "+data.user_name+"!");
+       
+       if(data !=="new"){
+           session=data.user;
+           session.members = data.members;
+           console.log("members: "+session.members);
+
+           limit = Math.ceil(session.members/2);
+           console.log("Limit checksession: "+limit);
+
+           $("a#user").append(" "+session.user_name+"!");
            $(".firstTask").addClass("hide");
            $(".loginDone").removeClass("hide");
            $("button[type=submit]").prop('disabled',true);
@@ -179,7 +187,7 @@ $("#posts").delegate("label", "click",function(e) {
                     postData.like=likearr;
                     postData.dislike=dislikearr;
 
-                    if(up === 3){
+                    if(up == limit){
                         postData.approved = true;
                     }
                     updatePost(postData);
@@ -204,10 +212,11 @@ $("#posts").delegate("label", "click",function(e) {
                     postData.like=likearr;
                     postData.dislike=dislikearr;
 
-                    if(up === 3){
+
+                    /*if(up === 3){
                         postData.approved = true;
                     }
-                    updatePost(postData);
+                    updatePost(postData);*/
 
                 }
             }
@@ -228,7 +237,7 @@ function updatePost(data)
 
             if(count===3)
             {
-                postTweet(updatedData.content);
+                postTweet(updatedData.content, updatedData.id);
 
             }
         }
@@ -236,7 +245,7 @@ function updatePost(data)
 }
 
 /*Upload post to twitter*/
-function postTweet(tweet)
+function postTweet(tweet,postId)
 {
     var data={"tweet":tweet};
     console.log("Inside postTweet client.js Tweet:"+tweet);
@@ -249,10 +258,14 @@ function postTweet(tweet)
             data:JSON.stringify(data),
             dataType: "json",
             success: function (updatedData) {
-                $div.html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
-                    "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
-                    "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
-                    "Tweet posted to your account. </div>");
+                if(updatedData.success == true){
+                    var select = "#"+postId;
+                    $(select).html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
+                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
+                        "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
+                        "Tweet posted to your account. </div>");
+                }
+
             }
         });
     }
@@ -296,8 +309,14 @@ $("#loginModal").delegate("#login",'click', function (event) {
             data: JSON.stringify(data),
             dataType:"json",
             contentType: "application/json",
-            success: function(data){
-                session=data;
+            success: function(logindata){
+                session=logindata.data;
+                session.members = logindata.total;
+
+                limit = Math.ceil(session.members/2);
+                console.log("Limit login: "+limit);
+
+                console.log("Total users: "+session.members);
                 $("#loginModal").modal("hide");
                 loginname=session.user_name;
                 loginuser=session.id;
@@ -414,9 +433,7 @@ $("#newSignUp").on("click", function(event){
                             err("#newUserName");
                             $("#signupAlert strong").text("Username is not available.");
                             $("#signupAlert").removeClass("hide");
-
                         }
-
                     },
                     error: function(error){
                         console.log(error);
