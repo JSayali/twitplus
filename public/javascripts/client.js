@@ -1,6 +1,19 @@
-var loginuser;
-var loginname;
-var groups = [];
+var session;
+
+$(document).ready(function(){
+    $.get( "http://localhost:8000/checkSession", function( data ) {
+       if(data!=="new"){
+           session=data;
+           $("a#user").append(" "+data.user_name+"!");
+           $(".firstTask").addClass("hide");
+           $(".loginDone").removeClass("hide");
+           $("button[type=submit]").prop('disabled',true);
+
+           loadTweets();
+       }
+    });
+});
+
 
 /*Add user's new post*/
 $("#tweetPost").submit(function(event){
@@ -8,12 +21,11 @@ $("#tweetPost").submit(function(event){
     event.preventDefault();             /**Ketul**/
 
     var tweet=$("#tweet").val();
-    var group = $("#grpId").text();
-    console.log(group);
-    var data={"tweet":tweet,
-    "username":loginname,
-    "userid":loginuser,
-    "group": group};
+    var data={
+        "tweet":tweet,
+        "username":session.user_name,
+        "userid":session.id
+    };
 
     $.ajax({
         url: "http://localhost:8000/tweet",
@@ -34,46 +46,50 @@ $("#tweetPost").submit(function(event){
     });
 });
 
-/*load all tweets*/
-function loadTweets(grpId)
+/*load all user posts*/
+function loadTweets()
 {
-    $.ajax({
-        url: "http://localhost:8000/loadTweets",     /*Ketul*/
-        type: "GET",
-        dataType:"json",
-        success: function (postData) {
-            $("div#posts").html("");
-            $(".userArea").removeClass("hide");
-            loginuser+="";
-            postData.forEach(function(postData) {
-                if(postData.group == grpId && postData.approved == false) {
-                    var likearr=postData.like;
-                    upcount=likearr.length;
+    var timeout = 0;
+    var ajaxFn = function(){
+        $.ajax({
+            url: "http://localhost:8000/loadTweets",     /*Ketul*/
+            type: "GET",
+            dataType:"json",
+            success: function (postData) {
+                $("div#posts").html("");
+                $(".userArea").removeClass("hide");
+
+                loginuser="";
+                loginuser+=session.id;
+                postData.forEach(function(postData) {
+
+                    if(postData.approved == false) {
+                        var likearr=postData.like;
+                        upcount=likearr.length;
 
                         var dislikearr=postData.dislike;
                         dcount=dislikearr.length;
 
                         if(likearr.indexOf(loginuser)!==-1)
                         {
-                            console.log("up");
                             var updown="up";
                         }
                         else if(dislikearr.indexOf(loginuser)!==-1)
                         {
-                            console.log("down");
                             var updown="down";
                         }
                         else
                         {
-                            console.log("no. Loginuser: "+loginuser+" Array up: "+likearr+" array down: "+dislikearr);
                             var updown="no";
                         }
                         displayName(postData.id,postData.content,postData.user,postData.date,upcount,dcount,updown);
-                }
-            });
+                    }
+                });
+            }
+        });
+    }
+    setTimeout(ajaxFn, 1000);
 
-        }
-    });
 }
 
 /*Display posts with upvote, downvote*/
@@ -95,7 +111,6 @@ function displayName(id, tweet, user, date, up, down, upNoDown){
         label1 = labelUp;
         label2 = labelDownActive;
     }
-
     /*not yet upvoted/downvoted.Both buttons unselected*/
     else{
         label1 = labelUp;
@@ -114,7 +129,7 @@ function displayName(id, tweet, user, date, up, down, upNoDown){
 
 }
 
-/*Display group posts*/
+/*Handle upvote downvote functionality*/
 $("#posts").delegate("label", "click",function(e) {
 
     var target = $(e.target);
@@ -144,7 +159,7 @@ $("#posts").delegate("label", "click",function(e) {
                 dislikearr=postData.dislike;
 
                 var usern="";
-                usern+=loginuser;
+                usern+=session.id;
 
 
                 if(target.hasClass("up")) {
@@ -164,16 +179,15 @@ $("#posts").delegate("label", "click",function(e) {
                     postData.like=likearr;
                     postData.dislike=dislikearr;
 
-                    if(up == 3){
+                    if(up === 3){
                         postData.approved = true;
                     }
                     updatePost(postData);
-
                 }
                 else if(target.hasClass("down")){
 
                     var usern="";
-                    usern+=loginuser;
+                    usern+=session.id;
 
                     if(likearr.indexOf(usern)!==-1)
                     {
@@ -190,32 +204,36 @@ $("#posts").delegate("label", "click",function(e) {
                     postData.like=likearr;
                     postData.dislike=dislikearr;
 
+                    if(up === 3){
+                        postData.approved = true;
+                    }
                     updatePost(postData);
 
                 }
             }
         });
+    }
+});
 
 function updatePost(data)
 {
-   $.ajax({
+    $.ajax({
         url: "http://localhost:8000/updatePost",
         type: "POST",
         contentType: "application/json",
         data:JSON.stringify(data),
         dataType: "json",
         success: function (updatedData) {
-            /*var count=(updatedData.like).length;*/
-            console.log("Approved: "+updatedData.approved);
-            if(updatedData.approved == true)
+            var count=(updatedData.like).length;
+
+            if(count===3)
             {
                 postTweet(updatedData.content);
+
             }
         }
     });
 }
-    }
-});
 
 /*Upload post to twitter*/
 function postTweet(tweet)
@@ -223,19 +241,22 @@ function postTweet(tweet)
     var data={"tweet":tweet};
     console.log("Inside postTweet client.js Tweet:"+tweet);
 
-    $.ajax({
-        url: "http://localhost:8000/postTwitter",
-        type: "POST",
-        contentType: "application/json",
-        data:JSON.stringify(data),
-        dataType: "json",
-        success: function (updatedData) {
-            $("div#"+updatedData.id).html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
-             "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
-             "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
-             "Tweet posted to your account. </div>");
-        }
-    });
+    var ajaxFctn = function(){
+        $.ajax({
+            url: "http://localhost:8000/postTwitter",
+            type: "POST",
+            contentType: "application/json",
+            data:JSON.stringify(data),
+            dataType: "json",
+            success: function (updatedData) {
+                $div.html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
+                    "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
+                    "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
+                    "Tweet posted to your account. </div>");
+            }
+        });
+    }
+    setTimeout(ajaxFctn, 3000);
 }
 
 /*Display field error*/
@@ -250,6 +271,7 @@ function err(sel){
 
 /*Handle login*/
 $("#loginModal").delegate("#login",'click', function (event) {
+
     event.preventDefault();
     var username, passwrd;
     if( !$("#user-name").val()) {
@@ -267,6 +289,7 @@ $("#loginModal").delegate("#login",'click', function (event) {
             "user_name": username,
             "password": passwrd
         };
+
         $.ajax({
             url: "http://localhost:8000/login",
             type: "POST",
@@ -274,22 +297,21 @@ $("#loginModal").delegate("#login",'click', function (event) {
             dataType:"json",
             contentType: "application/json",
             success: function(data){
-
+                session=data;
                 $("#loginModal").modal("hide");
-                loginname=data.user_name;
-                loginuser=data.id;
-                groups = data.member_of;
+                loginname=session.user_name;
+                loginuser=session.id;
 
-                $("a#user").text(loginname);
-                $("li.dropdown").removeClass("hide");
+                $("a#user").append(" "+loginname+"!");
+
                 $(".firstTask").addClass("hide");
                 $(".loginDone").removeClass("hide");
-                /*$(".userArea").removeClass("hide");*/
+
                 $(".heading").removeClass("hide");
 
                 $("button[type=submit]").prop('disabled',true);
 
-                loadgroups();
+                loadTweets();
 
             },
             error: function(data){
@@ -301,38 +323,16 @@ $("#loginModal").delegate("#login",'click', function (event) {
     }
 });
 
-/*Load user
-*GIVING ERROR THE FIRST TIME WEBSITE IS ACCESSED - NEED TO FIX*/
-function loadgroups(){
-    $.ajax({
-        url: "http://localhost:8000/getGroups",
-        type: "GET",
-        dataType:"json",
-        success: function (data) {
-            var grpIdcheck = "";
-            data.forEach(function(data){
-                grpIdcheck += data.id;
-                console.log("group id "+grpIdcheck);
-                if(groups.indexOf(grpIdcheck)!==-1){
-                    $("ul.dropdown-menu").append("<li class=\"grpNames\"><a href=\"#\">"+data.group_name+"</a></li>" +
-                        "<span class=\"grpId hide\">"+data.id+"</span>");
-                }
-                grpIdcheck = "";
-            });
-        },
-        error: function(error){
-            console.log(error);
-        }
-    });
-}
-
-/*Load tweets from a specific group when user selects the group from the list*/
-$("ul.dropdown-menu").delegate(".grpNames", "click", function(){
-
-    var grpId = $(this).next("span").text();
-    $("#headings").text($(this).text()).append("<span id=\"grpId\" class=\"hide\">"+grpId+"</span>");
-    loadTweets(grpId);
+$("#loginModal, #signupModal").on('shown.bs.modal', function () {
+    $('.focusOnOpen').focus();
 });
+
+$(".goToNext").keyup(function(event){
+    if(event.keyCode == 13){
+        $("#login, #newSignUp").click();
+    }
+});
+
 
 /*Disable and enable submit button by checking the textarea contents*/
 $('#tweet').keyup(function(){
@@ -340,8 +340,9 @@ $('#tweet').keyup(function(){
 });
 
 /*Remove field errors on keypress*/
-$("#user-name, #newUserName, #password, #newUserPass, #cnfrmPass, #twitter, #groupName, #grpmembers, #adduser").on("click keypress", function(){
-    $(this).parent().parent().removeClass("has-error");
+$("input").on("click keypress", function(){
+    /*$(this).parent().parent().removeClass("has-error");*/
+    $("div.has-error").removeClass("has-error");
     $("span.glyphicon-remove").remove();
     $(".alert").addClass("hide");
 });
@@ -352,7 +353,6 @@ $('.modal').on('hidden.bs.modal', function(){
     $(this).find("div.has-error").removeClass("has-error");
     $("span.glyphicon-remove").remove();
     $(".alert").addClass("hide");
-    $("ul#tag-cloud").text("");
 });
 
 /*Handle new user sign-up*/
@@ -374,128 +374,68 @@ $("#newSignUp").on("click", function(event){
     else if(!cnfrmPass){
         err("#cnfrmPass");
     }
-    else if(newPass !== cnfrmPass){
-        $(".alert").removeClass("hide");
+    else if($.isNumeric(newUser)) {
+        err("#newUserName");
+        $("#signupAlert strong").text("Cannot have numeric values.");
+        $("#signupAlert").removeClass("hide");
+    }
+    else if($.isNumeric(newPass)){
         err("#newUserPass");
-        err("#cnfrmPass");
+        $("#signupAlert strong").text("Cannot have numeric values.");
+        $("#signupAlert").removeClass("hide");
     }
-    else{
-        console.log("Password confirmed.");
-        var data = {
-            "user_name": newUser,
-            "password": newPass
-        };
-        $.ajax({
-         url: "http://localhost:8000/register",
-         type: "POST",
-         data: data,
-         dataType:"json",
-         success: function (data) {
-         console.log("new user created. "+data.id);
-         $("#signupModal").modal("hide");
-         }
-         });
-    }
-
-});
-
-/*Handle new group creation*/
-$("#createGrp").on("click", function(event){
-    event.preventDefault();
-    var grpName, twitterAcnt;
-
-    grpName = $("#groupName").val();
-    twitterAcnt = $("#twitter").val();
-    if(!grpName){
-        err("#groupName");
-    }
-    else if(!twitterAcnt){
-        err("#twitter");
-    }
-    else {
-
-        $("#groupModal").modal("hide");
-        $("#stack2").modal("show");
-
-        $.ajax({
-            url: "http://localhost:8000/createGroup",
-            type: "POST",
-            data: {
-                group_name: grpName,
-                twitterScr: twitterAcnt
-            },
-            dataType:"json",
-            success: function (postData) {
-                console.log("Group id: " + postData.id);
-                $("span#groupId").text(postData.id);
-                postData.id+="";
-                groups.push(postData.id);
-                console.log(groups + " id:"+ loginuser);
-                updateAdmin(loginuser, groups);
-                $("ul.dropdown-menu").append("<li class=\"grpNames\"><a href=\"#\">"+grpName+"</a></li>" +
-                    "<span class=\"grpId hide\">"+postData.id+"</span>");
-            }
-        });
-
-
-    }
-});
-
-/*Add group to the group list of the user who created the group*/
-function updateAdmin(user_id,newGroup){
-    console.log("newGroup: "+newGroup);
-    $.ajax({
-        url: "http://localhost:8000/adminUser",
-        type: "POST",
-        data: JSON.stringify({
-            user_id: user_id,
-            groups : newGroup
-        }),
-        dataType: "json",
-        contentType: "application/json",
-        success: function(data){
-            console.log("Admin profile success.");
-        },
-        error: function(error){
-            console.log(error);
+    else if(newPass !== cnfrmPass){
+            $("#signupAlert strong").text("Passwords do not match.");
+            $("#signupAlert").removeClass("hide");
+            err("#newUserPass");
+            err("#cnfrmPass");
         }
-    });
-}
+    else{
+            var data = {
+                "user_name": newUser,
+                "password": newPass
+            };
 
-/*Look for the li.tag-cloud element to be added when the logged-in user adds users to the group
-* and add those to the group*/
-jQuery(document).ready(function($) {
-    $("li.tag-cloud").initialize(function(){
-        var user = $(this).text();
-        var group = $("span#groupId").text();
-        $.ajax({
-            url: "http://localhost:8000/getUser",
-            method: "POST",
-            data:{
-                member: user,
-                group: group
-            },
-            dataType: "json",
-            success: function(data){
-                console.log(data);
-            },
-            error: function(error){
-                console.log(error);
-                $("div.forGrp").append("<div class=\"alert alert-danger alert-dismissible\" role=\"alert\"> " +
-                    "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
-                    "<span aria-hidden=\"true\">&times;</span></button> <strong>Alert!</strong> " +
-                    "Could not find users: "+user+"</div>");
-            }
-        })
-    });
+            var ajaxF = function (){
+                $.ajax({
+                    url: "http://localhost:8000/register",
+                    type: "POST",
+                    data: data,
+                    dataType:"json",
+                    success: function (data) {
+                        console.log(data);
+                        console.log("in success"+data.id);
+                        if(data.id!== false){
+                            console.log("new user created. "+data.id);
+                            $("#signupModal").modal("hide");
+                        }
+                        else {
+                            console.log("Username is not available.");
+                            err("#newUserName");
+                            $("#signupAlert strong").text("Username is not available.");
+                            $("#signupAlert").removeClass("hide");
+
+                        }
+
+                    },
+                    error: function(error){
+                        console.log(error);
+                    }
+                });
+            };
+            setTimeout(ajaxF, 3000);
+        }
+
+
 });
 
-/*Logout*/
 $("#logout").on("click", function(){
 
     $(".firstTask").removeClass("hide");
     $(".loginDone").addClass("hide");
     $(".userArea").addClass("hide");
-
-    location.reload();
+    $("#post").html("");
+    $.get( "http://localhost:8000/logout", function( data ) {
+        location.reload();
+    });
 });
