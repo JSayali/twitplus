@@ -172,7 +172,7 @@
             <div class="row">
                 <form id="tweetPost" role="form" class="form-inline">
                     <div class="col-lg-8 col-md-7 col-sm-9 col-xs-8">
-                        <textarea name="tweet" value="" id="tweet" maxlength="140" placeholder="Type your post here" id="userTweet"></textarea>
+                        <textarea name="tweet" value="" id="tweet" maxlength="140" placeholder="What's on your mind?" id="userTweet"></textarea>
                     </div>
                     <div class="col-lg-2 col-md-3 col-sm-3 col-xs-4">
                         <button type="submit" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" title="Add Post">
@@ -181,8 +181,13 @@
                     </div>
                 </form>
             </div>
-            <div class="row">
+            <div class="row" id="postsRow">
                 <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12" id="posts">
+                </div>
+                <div id="postsAlert" class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
+                    <div class="alert alert-info hide" role="alert">
+                        <strong></strong>
+                    </div>
                 </div>
             </div>
         </div>
@@ -203,7 +208,7 @@
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 <ul class="list-inline text-center">
                     <li>
-                        <a href="#">
+                        <a href="https://twitter.com/cpsc473" target="_blank">
                                 <span class="fa-stack fa-lg">
                                     <i class="fa fa-circle fa-stack-2x"></i>
                                     <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
@@ -211,7 +216,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="https://github.com/JSayali/twitplus" target="_blank">
                                 <span class="fa-stack fa-lg">
                                     <i class="fa fa-circle fa-stack-2x"></i>
                                     <i class="fa fa-github fa-stack-1x fa-inverse"></i>
