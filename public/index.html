@@ -12,8 +12,7 @@
     <title>Twitter Gateway</title>
 
     <!-- Bootstrap Core CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"
-          integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
 
     <!-- Custom CSS -->
     <link href="stylesheets/clean-blog.css" rel="stylesheet">
@@ -34,215 +33,223 @@
 </head>
 
 <body>
-<!-- Navigation -->
-<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
-    <div class="container-fluid">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header page-scroll">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+    <!-- Navigation -->
+    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+        <div class="container-fluid">
+            <!-- Brand and toggle get grouped for better mobile display -->
+            <div class="navbar-header page-scroll">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
                 <span class="sr-only">Toggle navigation</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="index.html">Twitter +</a>
-        </div>
+                <a class="navbar-brand" href="index.html">Twitter +</a>
+            </div>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="#" id="signin" class="firstTask" data-toggle="modal" data-target="#loginModal">Sign In</a>
-                </li>
-                <li>
-                    <a class="loginDone hide" id="user">Welcome</a>
-                </li>
-                <li>
-                    <a href="#" class="loginDone hide" id="logout">Logout</a>
-                </li>
-                <li>
-                    <a href="#" class="firstTask" id="signup" data-toggle="modal" data-target="#signupModal">Sign Up</a>
-                </li>
-            </ul>
+            <!-- Collect the nav links, forms, and other content for toggling -->
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a href="#" id="signin" class="firstTask" data-toggle="modal" data-target="#loginModal">Sign In</a>
+                    </li>
+                    <li>
+                        <a class="loginDone hide" id="user">Welcome</a>
+                    </li>
+                    <li>
+                        <a href="#" class="loginDone hide" id="logout">Logout</a>
+                    </li>
+                    <li>
+                        <a href="#" class="firstTask" id="signup" data-toggle="modal" data-target="#signupModal">Sign Up</a>
+                    </li>
+                </ul>
+            </div>
+            <!-- /.navbar-collapse -->
         </div>
-        <!-- /.navbar-collapse -->
-    </div>
-    <!-- /.container -->
-</nav>
+        <!-- /.container -->
+    </nav>
 
-<!-- Page Header -->
-<!-- Set your background image for this header on the line below. -->
-<header class="intro-header" style="background-image: url('images/home-bg.jpg')">
-    <div class="container">
-        <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <div class="site-heading">
-                    <h1>Twitter +</h1>
-                    <hr class="small">
-                    <span class="subheading">Acerbic Unseemliness</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</header>
-
-<!-- Main Content -->
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="loginModalLabel">Sign In</h4>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="user-name" class="control-label">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-                            <input type="text" name="focus" id="user-name" class="form-control focusOnOpen">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password" class="control-label">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-                            <input type="password" id="password" class="form-control goToNext">
-                        </div>
-                    </div>
-                </form>
-                <div class="alert alert-danger hide" role="alert">
-                    <strong>Please check your credentials.</strong>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success btn-sm" id="login" data-toggle="collapse" data-target="#loginclicked">Sign In</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupLabel">
-    <div class="modal-dialog modal-sm" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close closeAlert" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="signupLabel">Sign Up</h4>
-            </div>
-            <div class="modal-body">
-                <form data-toggle="validator" role="form">
-                    <div class="form-group">
-                        <label for="newUserName" class="control-label">Username</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
-                            <input type="text" class="form-control focusOnOpen" id="newUserName" maxlength="15" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="newUserPass" class="control-label">Password</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-                            <input type="password" id="newUserPass" class="form-control">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="cnfrmPass" class="control-label">Confirm Password</label>
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
-                            <input type="password" id="cnfrmPass" class="form-control goToNext">
-                        </div>
-                    </div>
-                </form>
-                <div class="alert alert-danger hide" id="signupAlert" role="alert">
-                    <strong></strong>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default btn-sm closeAlert" data-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-success btn-sm" id="newSignUp" data-toggle="collapse" data-target="#signupclicked">Sign Up</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="container hide userArea">
-    <div class="row">
-        <div id="group" class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+    <!-- Page Header -->
+    <!-- Set your background image for this header on the line below. -->
+    <header class="intro-header" style="background-image: url('images/home-bg.jpg')">
+        <div class="container">
             <div class="row">
-                <form id="tweetPost" role="form" class="form-inline">
-                    <div class="col-lg-8 col-md-7 col-sm-9 col-xs-8">
-                        <textarea name="tweet" value="" id="tweet" maxlength="140" placeholder="What's on your mind?" id="userTweet"></textarea>
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <div class="site-heading">
+                        <h1>Twitter +</h1>
+                        <hr class="small">
+                        <span class="subheading">Acerbic Unseemliness</span>
                     </div>
-                    <div class="col-lg-2 col-md-3 col-sm-3 col-xs-4">
-                        <button type="submit" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" title="Add Post">
-                            <i class="fa fa-plus-square fa-lg" style="padding: 0px; margin: 0"></i>
-                        </button>
-                    </div>
-                </form>
-            </div>
-            <div class="row" id="postsRow">
-                <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12" id="posts">
                 </div>
-                <div id="postsAlert" class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
-                    <div class="alert alert-info hide" role="alert">
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="loginModalLabel">Sign In</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="user-name" class="control-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+                                <input type="text" name="focus" id="user-name" class="form-control focusOnOpen">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password" class="control-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+                                <input type="password" id="password" class="form-control goToNext">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="alert alert-danger hide" role="alert">
+                        <strong>Please check your credentials.</strong>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success btn-sm" id="login" data-toggle="collapse" data-target="#loginclicked">Sign In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="signupModal" tabindex="-1" role="dialog" aria-labelledby="signupLabel">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close closeAlert" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="signupLabel">Sign Up</h4>
+                </div>
+                <div class="modal-body">
+                    <form data-toggle="validator" role="form">
+                        <div class="form-group">
+                            <label for="newUserName" class="control-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+                                <input type="text" class="form-control focusOnOpen" id="newUserName" maxlength="15" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="newUserPass" class="control-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+                                <input type="password" id="newUserPass" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="cnfrmPass" class="control-label">Confirm Password</label>
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="fa fa-key fa-fw"></i></span>
+                                <input type="password" id="cnfrmPass" class="form-control goToNext">
+                            </div>
+                        </div>
+                    </form>
+                    <div class="alert alert-danger hide" id="signupAlert" role="alert">
                         <strong></strong>
                     </div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default btn-sm closeAlert" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-success btn-sm" id="newSignUp" data-toggle="collapse" data-target="#signupclicked">Sign Up</button>
+                </div>
             </div>
-        </div>
-        <div id="twitterFrame" class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
-            <a class="twitter-timeline" href="https://twitter.com/cpsc473" data-widget-id="712752743727771649">Tweets by @cpsc473</a>
-            <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';
-                if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";
-                    fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
         </div>
     </div>
 
-</div>
-
-<!-- Footer -->
-<footer>
-    <div class="container footer">
+    <div class="container hide userArea">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
-                <ul class="list-inline text-center">
-                    <li>
-                        <a href="https://twitter.com/cpsc473" target="_blank">
+            <div id="group" class="col-lg-8 col-md-8 col-sm-8 col-xs-8">
+                <div class="row">
+                    <form id="tweetPost" role="form" class="form-inline">
+                        <div class="col-lg-8 col-md-7 col-sm-9 col-xs-8">
+                            <textarea name="tweet" value="" id="tweet" maxlength="140" placeholder="What's on your mind?" id="userTweet"></textarea>
+                        </div>
+                        <div class="col-lg-2 col-md-3 col-sm-3 col-xs-4">
+                            <button type="submit" class="btn btn-success" data-toggle="tooltip" data-placement="bottom" title="Add Post">
+                            <i class="fa fa-plus-square fa-lg" style="padding: 0px; margin: 0"></i>
+                        </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="row" id="postsRow">
+                    <div class="col-lg-10 col-md-10 col-sm-12 col-xs-12" id="posts">
+                    </div>
+                    <div id="postsAlert" class="col-lg-10 col-md-10 col-sm-12 col-xs-12">
+                        <div class="alert alert-info hide" role="alert">
+                            <strong></strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="twitterFrame" class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                <a class="twitter-timeline" href="https://twitter.com/cpsc473" data-widget-id="712752743727771649">Tweets by @cpsc473</a>
+                <script>
+                    ! function(d, s, id) {
+                        var js, fjs = d.getElementsByTagName(s)[0],
+                            p = /^http:/.test(d.location) ? 'http' : 'https';
+                        if (!d.getElementById(id)) {
+                            js = d.createElement(s);
+                            js.id = id;
+                            js.src = p + "://platform.twitter.com/widgets.js";
+                            fjs.parentNode.insertBefore(js, fjs);
+                        }
+                    }(document, "script", "twitter-wjs");
+                </script>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer">
+            <div class="row">
+                <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                    <ul class="list-inline text-center">
+                        <li>
+                            <a href="https://twitter.com/cpsc473" target="_blank">
                                 <span class="fa-stack fa-lg">
                                     <i class="fa fa-circle fa-stack-2x"></i>
                                     <i class="fa fa-twitter fa-stack-1x fa-inverse"></i>
                                 </span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="https://github.com/JSayali/twitplus" target="_blank">
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/JSayali/twitplus" target="_blank">
                                 <span class="fa-stack fa-lg">
                                     <i class="fa fa-circle fa-stack-2x"></i>
                                     <i class="fa fa-github fa-stack-1x fa-inverse"></i>
                                 </span>
-                        </a>
-                    </li>
-                </ul>
-                <p class="copyright text-muted">Copyright &copy; Acerbic Unseemliness 2016</p>
+                            </a>
+                        </li>
+                    </ul>
+                    <p class="copyright text-muted">Copyright &copy; Acerbic Unseemliness 2016</p>
+                </div>
             </div>
         </div>
-    </div>
-</footer>
+    </footer>
 
-<!-- jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
 
 
-<!-- Bootstrap Core JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"
-        integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+    <!-- Bootstrap Core JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
 
-<!-- Custom Theme JavaScript -->
-<script src="javascripts/clean-blog.js"></script>
-<script src="javascripts/client.js"></script>
-<script src="javascripts/bootstrap-tag-cloud.js"></script>
-<script src="javascripts/jquery.initialize.js"></script>
+    <!-- Custom Theme JavaScript -->
+    <script src="javascripts/clean-blog.js"></script>
+    <script src="javascripts/client.js"></script>
+    <script src="javascripts/bootstrap-tag-cloud.js"></script>
+    <script src="javascripts/jquery.initialize.js"></script>
 
 </body>
 
