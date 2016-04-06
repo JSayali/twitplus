@@ -42,3 +42,7 @@ button[type=submit] {
     display: block;
     width: 100%;
 }
+i.fa-plus-square {
+    padding: 0px;
+    margin:0px;
+}

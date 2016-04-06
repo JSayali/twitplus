@@ -1,10 +1,14 @@
+// Client-side code
+/* jshint browser: true, jquery: true, curly: true, eqeqeq: true, forin: true, immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: double, undef: true, unused: true, strict: true, trailing: true */
+// Server-side code
+/* jshint node: true, curly: true, eqeqeq: true, forin: true, immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: double, undef: true, unused: true, strict: true, trailing: true */
 "use strict";
 
 var session;
 var limit;
 
 /*Display posts with upvote, downvote*/
-var displayName = function(id, tweet, user, date, up, down, upNoDown) {
+function displayName(id, tweet, user, date, up, down, upNoDown) {
 
     var label1, label2;
     var labelupActive = "<label class=\"btn btn-default up active\">";
@@ -38,10 +42,11 @@ var displayName = function(id, tweet, user, date, up, down, upNoDown) {
     /*prepend to show the latest post on top*/
     $("#posts").prepend(post);
 
-};
+}
 
-// Load all tweets for group
-var loadTweets = function() {
+
+/*Load all user posts from database*/
+function loadTweets() {
     var countFlag = false;
     var ajaxFn = function() {
         $.ajax({
@@ -58,13 +63,13 @@ var loadTweets = function() {
 
                     if (postData.approved === false) {
                         countFlag = true;
+                        var upcount, dcount, updown;
                         var likearr = postData.like;
-                        var upcount = likearr.length;
+                        upcount = likearr.length;
 
                         var dislikearr = postData.dislike;
-                        var dcount = dislikearr.length;
+                        dcount = dislikearr.length;
 
-                        var updown;
                         if (likearr.indexOf(loginuser) !== -1) {
                             updown = "up";
                         } else if (dislikearr.indexOf(loginuser) !== -1) {
@@ -84,10 +89,10 @@ var loadTweets = function() {
     };
     setTimeout(ajaxFn, 1000);
 
-};
+}
 
+/*Check session on page refresh*/
 $(document).ready(function() {
-
     $.get("http://localhost:8000/checkSession", function(data) {
 
         if (data !== "new") {
@@ -108,10 +113,11 @@ $(document).ready(function() {
     });
 });
 
+
 /*Add user's new post*/
 $("#tweetPost").submit(function(event) {
 
-    event.preventDefault(); /**Ketul**/
+    event.preventDefault();
 
     var tweet = $("#tweet").val();
     var data = {
@@ -140,7 +146,7 @@ $("#tweetPost").submit(function(event) {
 });
 
 /*Upload post to twitter*/
-var postTweet = function(tweet, postId) {
+function postTweet(tweet, postId) {
     var data = {
         "tweet": tweet
     };
@@ -166,10 +172,10 @@ var postTweet = function(tweet, postId) {
         });
     };
     setTimeout(ajaxFctn, 3000);
-};
+}
 
-// Updates tweet
-var updatePost = function(data) {
+/*Update post after upvote or downvote*/
+function updatePost(data) {
     $.ajax({
         url: "http://localhost:8000/updatePost",
         type: "POST",
@@ -185,7 +191,7 @@ var updatePost = function(data) {
             }
         }
     });
-};
+}
 
 /*Handle upvote downvote functionality*/
 $("#posts").delegate("label", "click", function(e) {
@@ -269,21 +275,22 @@ $("#posts").delegate("label", "click", function(e) {
     }
 });
 
+
 /*Display field error*/
-var err = function(sel) {
+function err(sel) {
     var $pDiv = $(sel).parent();
     $pDiv.append("<span class=\"glyphicon glyphicon-remove form-control-feedback\"></span>");
     $pDiv.fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
     var $gpDiv = $pDiv.parent();
     $gpDiv.addClass("has-error");
 
-};
+}
 
 /*Handle login*/
 $("#loginModal").delegate("#login", "click", function(event) {
 
     event.preventDefault();
-    var username, passwrd;
+    var username, passwrd, loginname, loginuser;
     if (!$("#user-name").val()) {
         err("#user-name");
     } else if (!$("#password").val()) {
@@ -305,15 +312,16 @@ $("#loginModal").delegate("#login", "click", function(event) {
             dataType: "json",
             contentType: "application/json",
             success: function(logindata) {
-                var session = logindata.data;
+                session = logindata.data;
                 session.members = logindata.total;
 
-                var limit = Math.ceil(session.members / 2);
+                limit = Math.ceil(session.members / 2);
                 console.log("Limit login: " + limit);
 
                 console.log("Total users: " + session.members);
                 $("#loginModal").modal("hide");
-                var loginname = session.user_name;
+                loginname = session.user_name;
+                loginuser = session.id;
 
                 $("a#user").append(" " + loginname + "!");
 
@@ -336,16 +344,17 @@ $("#loginModal").delegate("#login", "click", function(event) {
     }
 });
 
+/*Shift focus on fiest form element after opening the modal*/
 $("#loginModal, #signupModal").on("shown.bs.modal", function() {
     $(".focusOnOpen").focus();
 });
 
+/*Allow button click on hitting enter*/
 $(".goToNext").keyup(function(event) {
     if (event.keyCode === 13) {
         $("#login, #newSignUp").click();
     }
 });
-
 
 /*Disable and enable submit button by checking the textarea contents*/
 $("#tweet").keyup(function() {
@@ -433,6 +442,7 @@ $("#newSignUp").on("click", function(event) {
 
 });
 
+/*Handle user logout*/
 $("#logout").on("click", function() {
 
     $(".firstTask").removeClass("hide");

@@ -1,13 +1,17 @@
-// Node modules for Project
-var express = require('express');
+// Client-side code
+/* jshint browser: true, jquery: true, curly: true, eqeqeq: true, forin: true, immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: double, undef: true, unused: true, strict: true, trailing: true */
+// Server-side code
+/* jshint node: true, curly: true, eqeqeq: true, forin: true, immed: true, indent: 4, latedef: true, newcap: true, nonew: true, quotmark: double, undef: true, unused: true, strict: true, trailing: true */
+"use strict";
+
+var express = require("express");
 var bodyParser = require("body-parser");
-var cookieParser = require('cookie-parser');
+var cookieParser = require("cookie-parser");
 var session = require("express-session");
-var request = require('request');
-var Twitter = require('twitter');
+var request = require("request");
+var Twitter = require("twitter");
 var app = express();
 
-// Session data variable
 var sess;
 
 app.use(bodyParser.urlencoded({
@@ -18,15 +22,16 @@ app.use(session({
     secret: "RQSHJD23HG"
 }));
 app.use(bodyParser.json());
-app.use(express.static('public'));
+app.use(express.static("public"));
 
-// Check to see if a session exists for login
-//   If user aready has a session it reloads it, if not
-//   new session data is created.
-app.get('/checkSession', function(req, res) {
+/*Check to see if a session exists for login
+If user aready has a session it reloads it, if not
+ new session data is created.*/
+app.get("/checkSession", function(req, res) {
     sess = req.session;
+    console.log("inside checksession");
 
-    if (typeof sess.user != 'undefined') {
+    if (typeof sess.user !== "undefined") {
         var data = sess;
         res.send(data);
     } else {
@@ -34,8 +39,8 @@ app.get('/checkSession', function(req, res) {
     }
 });
 
-// Create an account.
-//    Adds username and password to database on success
+/*Create an account.
+Adds username and password to database on success*/
 app.post("/register", function(req, res) {
     request({
             url: "http://localhost:3000/users?user_name=" + req.body.user_name
@@ -70,13 +75,27 @@ app.post("/register", function(req, res) {
 
 });
 
-// Add new tweet
-//    Adds tweet to database on success
-app.post('/tweet', function(req, res) {
+/*Get month name from month number*/
+function GetMonthName(monthNumber) {
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    return months[monthNumber - 1];
+}
 
-    var tweet = req.body.tweet; // Tweet text
-    var user = req.body.username; // Posting user
-    var userid = req.body.userid; // Unique user id
+/*Get today's date*/
+function getDate() {
+    var d = new Date();
+    var month = d.getMonth() + 1;
+    var day = d.getDate();
+    var output = GetMonthName(month) + " " + day + ", " + d.getFullYear();
+    return output;
+}
+
+/*Add user post to database*/
+app.post("/tweet", function(req, res) {
+
+    var tweet = req.body.tweet;
+    var user = req.body.username;
+    var userid = req.body.userid;
     var data = {
         "content": tweet,
         "user": user,
@@ -87,9 +106,9 @@ app.post('/tweet', function(req, res) {
     };
 
     request.post({
-        url: 'http://localhost:3000/posts',
+        url: "http://localhost:3000/posts",
         headers: {
-            'Content-Type': 'application/json'
+            "Content-Type": "application/json"
         },
         body: JSON.stringify(data)
     }, function(err, httpResponse, body) {
@@ -98,41 +117,40 @@ app.post('/tweet', function(req, res) {
     });
 });
 
-// Load all tweets associated with Group
-app.get('/loadTweets', function(req, res) {
+/*Load all tweets from database*/
+app.get("/loadTweets", function(req, res) {
 
-    request('http://localhost:3000/posts', function(error, response, body) {
-        if (!error && response.statusCode == 200) {
+    request("http://localhost:3000/posts", function(error, response, body) {
+        if (!error && response.statusCode === 200) {
             res.send(JSON.parse(body));
         }
     });
 
 });
 
-// Getting all vote counts for a specific tweet
-app.get('/getVotes', function(req, res) {
+/*Get votes of a specific tweet*/
+app.get("/getVotes", function(req, res) {
 
     var id = req.param("id");
 
-    request('http://localhost:3000/posts/' + id, function(error, response, body) {
-        if (!error && response.statusCode == 200) {
+    request("http://localhost:3000/posts/" + id, function(error, response, body) {
+        if (!error && response.statusCode === 200) {
             res.send(JSON.parse(body));
         }
     });
 
 });
 
-// Login to application
-//   Updates session data
-app.post('/login', function(req, res) {
+/*User authentication*/
+app.post("/login", function(req, res) {
 
-    var unm, pwrd; // Username and password of user
-    sess = req.session; // Session data
-    user = req.body.user_name; // Username
-    pass = req.body.password; // Password
+    var unm, pwrd;
+    sess = req.session;
+    var user = req.body.user_name;
+    var pass = req.body.password;
 
-    request('http://localhost:3000/users', function(error, response, body) {
-        if (!error && response.statusCode == 200) {
+    request("http://localhost:3000/users", function(error, response, body) {
+        if (!error && response.statusCode === 200) {
 
             var flag = false;
             var data = JSON.parse(body);
@@ -154,25 +172,27 @@ app.post('/login', function(req, res) {
                     });
                 }
             }
-            if (flag === false)
+            if (flag === false) {
                 res.status(401).json({
-                    error: 'message'
+                    error: "message"
                 });
+            }
+
         }
     });
 
 });
 
-// Posting additions to tweets
-app.post('/updatePost', function(req, res) {
+/*Update the post*/
+app.post("/updatePost", function(req, res) {
 
-    var data = req.body; // Request body
+    var data = req.body;
 
-    var id = data.id; // Tweet unique id
+    var id = data.id;
 
     request({
-        url: 'http://localhost:3000/posts/' + id,
-        method: 'PUT',
+        url: "http://localhost:3000/posts/" + id,
+        method: "PUT",
         json: data
     }, function(err, httpResponse, body) {
 
@@ -181,14 +201,14 @@ app.post('/updatePost', function(req, res) {
     });
 });
 
-// Logout of Application
-//    Updates session data
+/*Application logout
+Destroy session data*/
 app.get("/logout", function(req, res) {
     req.session.destroy();
     res.send("success");
 });
 
-// Post tweet to Twitter
+/*Post to twitter*/
 app.post("/postTwitter", function(req, res) {
 
     var tweet = req.body.tweet;
@@ -196,19 +216,17 @@ app.post("/postTwitter", function(req, res) {
 
     var client = new Twitter({
         consumer_key: "wdupZpyaeLjCvqhsrJsDp20ix",
-        consumer_secret: 'xsAzRqdU32W59Ow2OjhAtyex7WozQwWClc1Vf7bOYoIYTKHHYs',
-        access_token_key: '706613428790566912-BYASC0htSA2V2bcB2Ps4OmQdpwj3s40',
-        access_token_secret: 'L8SL9Na2RwZ6c12r4HlxVJkXQnC5CqHn60GQjoWxYINmT'
+        consumer_secret: "xsAzRqdU32W59Ow2OjhAtyex7WozQwWClc1Vf7bOYoIYTKHHYs",
+        access_token_key: "706613428790566912-BYASC0htSA2V2bcB2Ps4OmQdpwj3s40",
+        access_token_secret: "L8SL9Na2RwZ6c12r4HlxVJkXQnC5CqHn60GQjoWxYINmT"
     });
 
-    var params = {
-        screen_name: 'cpsc473'
-    };
-
-    client.post('statuses/update', {
+    client.post("statuses/update", {
         status: tweet
     }, function(error, tweet, response) {
-        if (error) throw error;
+        if (error) {
+            throw error;
+        }
         console.log(tweet); // Tweet body.
         console.log(response); // Raw response object.
         res.send({
@@ -217,21 +235,6 @@ app.post("/postTwitter", function(req, res) {
     });
 
 });
-
-// Get formatted data for tweet listings
-function getDate() {
-    var d = new Date();
-    var month = d.getMonth() + 1;
-    var day = d.getDate();
-    var output = GetMonthName(month) + " " + day + ", " + d.getFullYear();
-    return output;
-}
-
-// Get formatted month name
-function GetMonthName(monthNumber) {
-    var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    return months[monthNumber - 1];
-}
 
 app.listen(8000);
 
