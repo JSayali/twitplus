@@ -44,7 +44,7 @@ $("#tweetPost").submit(function(event){
 
             $("#tweet").val("");
             $("button[type=submit]").prop('disabled',true);
-            
+
             var likearr=postData.like;
             upcount=likearr.length;
 
@@ -215,10 +215,10 @@ $("#posts").delegate("label", "click",function(e) {
                     postData.dislike=dislikearr;
 
 
-                    /*if(up === 3){
+                    if(up === limit){
                         postData.approved = true;
                     }
-                    updatePost(postData);*/
+                    updatePost(postData);
 
                 }
             }
@@ -237,7 +237,7 @@ function updatePost(data)
         success: function (updatedData) {
             var count=(updatedData.like).length;
 
-            if(count===3)
+            if(count===limit)
             {
                 postTweet(updatedData.content, updatedData.id);
 
