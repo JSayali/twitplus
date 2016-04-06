@@ -17,6 +17,11 @@
         "serve-favicon": "~2.3.0"
     },
     "jshintConfig": {
+        "globals": {
+            "$": false,
+            "document": false,
+            "location": false   
+        },
         "curly": true,
         "eqeqeq": true,
         "forin": true,

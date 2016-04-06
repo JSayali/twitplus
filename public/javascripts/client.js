@@ -1,113 +1,14 @@
+"use strict";
+
 var session;
 var limit;
 
-$(document).ready(function() {
-    $.get("http://localhost:8000/checkSession", function(data) {
-
-        if (data !== "new") {
-            session = data.user;
-            session.members = data.members;
-            console.log("members: " + session.members);
-
-            limit = Math.ceil(session.members / 2);
-            console.log("Limit checksession: " + limit);
-
-            $("a#user").append(" " + session.user_name + "!");
-            $(".firstTask").addClass("hide");
-            $(".loginDone").removeClass("hide");
-            $("button[type=submit]").prop('disabled', true);
-
-            loadTweets();
-        }
-    });
-});
-
-
-/*Add user's new post*/
-$("#tweetPost").submit(function(event) {
-
-    event.preventDefault(); /**Ketul**/
-
-    var tweet = $("#tweet").val();
-    var data = {
-        "tweet": tweet,
-        "username": session.user_name,
-        "userid": session.id
-    };
-
-    $.ajax({
-        url: "http://localhost:8000/tweet",
-        type: "POST",
-        data: data,
-        dataType: "json",
-        success: function(postData) {
-
-            $("#tweet").val("");
-            $("button[type=submit]").prop('disabled', true);
-            $("#postsAlert .alert").addClass("hide");
-
-            var likearr = postData.like;
-            upcount = likearr.length;
-
-            var dislikearr = postData.dislike;
-            dcount = dislikearr.length;
-
-            displayName(postData.id, postData.content, postData.user, postData.date, upcount, 0, "up");
-        }
-    });
-});
-
-/*load all user posts*/
-function loadTweets() {
-    var countFlag = false;
-    var ajaxFn = function() {
-        $.ajax({
-            url: "http://localhost:8000/loadTweets",
-            type: "GET",
-            dataType: "json",
-            success: function(postData) {
-                $("div#posts").html("");
-                $(".userArea").removeClass("hide");
-
-                loginuser = "";
-                loginuser += session.id;
-                postData.forEach(function(postData) {
-
-                    if (postData.approved == false) {
-                        countFlag = true;
-                        var likearr = postData.like;
-                        upcount = likearr.length;
-
-                        var dislikearr = postData.dislike;
-                        dcount = dislikearr.length;
-
-                        if (likearr.indexOf(loginuser) !== -1) {
-                            var updown = "up";
-                        } else if (dislikearr.indexOf(loginuser) !== -1) {
-                            var updown = "down";
-                        } else {
-                            var updown = "no";
-                        }
-                        displayName(postData.id, postData.content, postData.user, postData.date, upcount, dcount, updown);
-                    }
-                });
-                if (countFlag == false) {
-                    $("#postsAlert .alert").text("Currently, there are no posts to show.");
-                    $("#postsAlert .alert").removeClass("hide");
-                }
-            }
-        });
-    }
-    setTimeout(ajaxFn, 1000);
-
-}
-
 /*Display posts with upvote, downvote*/
-function displayName(id, tweet, user, date, up, down, upNoDown) {
+var displayName = function(id, tweet, user, date, up, down, upNoDown) {
 
     var label1, label2;
     var labelupActive = "<label class=\"btn btn-default up active\">";
-    var labelDownActive = "<label class=\"btn btn-default down active\">"
+    var labelDownActive = "<label class=\"btn btn-default down active\">";
     var labelUp = "<label class=\"btn btn-default up\">";
     var labelDown = "<label class=\"btn btn-default down \">";
 
@@ -137,7 +38,154 @@ function displayName(id, tweet, user, date, up, down, upNoDown) {
     /*prepend to show the latest post on top*/
     $("#posts").prepend(post);
 
-}
+};
+
+// Load all tweets for group
+var loadTweets = function() {
+    var countFlag = false;
+    var ajaxFn = function() {
+        $.ajax({
+            url: "http://localhost:8000/loadTweets",
+            type: "GET",
+            dataType: "json",
+            success: function(postData) {
+                $("div#posts").html("");
+                $(".userArea").removeClass("hide");
+
+                var loginuser = "";
+                loginuser += session.id;
+                postData.forEach(function(postData) {
+
+                    if (postData.approved === false) {
+                        countFlag = true;
+                        var likearr = postData.like;
+                        var upcount = likearr.length;
+
+                        var dislikearr = postData.dislike;
+                        var dcount = dislikearr.length;
+
+                        var updown;
+                        if (likearr.indexOf(loginuser) !== -1) {
+                            updown = "up";
+                        } else if (dislikearr.indexOf(loginuser) !== -1) {
+                            updown = "down";
+                        } else {
+                            updown = "no";
+                        }
+                        displayName(postData.id, postData.content, postData.user, postData.date, upcount, dcount, updown);
+                    }
+                });
+                if (countFlag === false) {
+                    $("#postsAlert .alert").text("Currently, there are no posts to show.");
+                    $("#postsAlert .alert").removeClass("hide");
+                }
+            }
+        });
+    };
+    setTimeout(ajaxFn, 1000);
+
+};
+
+$(document).ready(function() {
+
+    $.get("http://localhost:8000/checkSession", function(data) {
+
+        if (data !== "new") {
+            session = data.user;
+            session.members = data.members;
+            console.log("members: " + session.members);
+
+            limit = Math.ceil(session.members / 2);
+            console.log("Limit checksession: " + limit);
+
+            $("a#user").append(" " + session.user_name + "!");
+            $(".firstTask").addClass("hide");
+            $(".loginDone").removeClass("hide");
+            $("button[type=submit]").prop("disabled", true);
+
+            loadTweets();
+        }
+    });
+});
+
+/*Add user's new post*/
+$("#tweetPost").submit(function(event) {
+
+    event.preventDefault(); /**Ketul**/
+
+    var tweet = $("#tweet").val();
+    var data = {
+        "tweet": tweet,
+        "username": session.user_name,
+        "userid": session.id
+    };
+
+    $.ajax({
+        url: "http://localhost:8000/tweet",
+        type: "POST",
+        data: data,
+        dataType: "json",
+        success: function(postData) {
+
+            $("#tweet").val("");
+            $("button[type=submit]").prop("disabled", true);
+            $("#postsAlert .alert").addClass("hide");
+
+            var likearr = postData.like;
+            var upcount = likearr.length;
+
+            displayName(postData.id, postData.content, postData.user, postData.date, upcount, 0, "up");
+        }
+    });
+});
+
+/*Upload post to twitter*/
+var postTweet = function(tweet, postId) {
+    var data = {
+        "tweet": tweet
+    };
+    console.log("Inside postTweet client.js Tweet:" + tweet);
+
+    var ajaxFctn = function() {
+        $.ajax({
+            url: "http://localhost:8000/postTwitter",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(data),
+            dataType: "json",
+            success: function(updatedData) {
+                if (updatedData.success === true) {
+                    var select = "#" + postId;
+                    $(select).html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
+                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
+                        "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
+                        "Tweet posted to your account. </div>");
+                }
+
+            }
+        });
+    };
+    setTimeout(ajaxFctn, 3000);
+};
+
+// Updates tweet
+var updatePost = function(data) {
+    $.ajax({
+        url: "http://localhost:8000/updatePost",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(data),
+        dataType: "json",
+        success: function(updatedData) {
+            var count = (updatedData.like).length;
+
+            if (count === limit) {
+                postTweet(updatedData.content, updatedData.id);
+
+            }
+        }
+    });
+};
 
 /*Handle upvote downvote functionality*/
 $("#posts").delegate("label", "click", function(e) {
@@ -145,10 +193,9 @@ $("#posts").delegate("label", "click", function(e) {
     var target = $(e.target);
     var lab = target.closest("label");
 
-    if (lab.hasClass("active"))
+    if (lab.hasClass("active")) {
         console.log("already selected");
-    else {
-        var like = 0;
+    } else {
         var $div = target.closest("div.post-preview");
         var id = $div.attr("id");
 
@@ -187,13 +234,13 @@ $("#posts").delegate("label", "click", function(e) {
                     postData.like = likearr;
                     postData.dislike = dislikearr;
 
-                    if (up == limit) {
+                    if (up === limit) {
                         postData.approved = true;
                     }
                     updatePost(postData);
                 } else if (target.hasClass("down")) {
 
-                    var usern = "";
+                    usern = "";
                     usern += session.id;
 
                     if (likearr.indexOf(usern) !== -1) {
@@ -222,65 +269,18 @@ $("#posts").delegate("label", "click", function(e) {
     }
 });
 
-function updatePost(data) {
-    $.ajax({
-        url: "http://localhost:8000/updatePost",
-        type: "POST",
-        contentType: "application/json",
-        data: JSON.stringify(data),
-        dataType: "json",
-        success: function(updatedData) {
-            var count = (updatedData.like).length;
-
-            if (count === limit) {
-                postTweet(updatedData.content, updatedData.id);
-
-            }
-        }
-    });
-}
-
-/*Upload post to twitter*/
-function postTweet(tweet, postId) {
-    var data = {
-        "tweet": tweet
-    };
-    console.log("Inside postTweet client.js Tweet:" + tweet);
-
-    var ajaxFctn = function() {
-        $.ajax({
-            url: "http://localhost:8000/postTwitter",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify(data),
-            dataType: "json",
-            success: function(updatedData) {
-                if (updatedData.success == true) {
-                    var select = "#" + postId;
-                    $(select).html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
-                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
-                        "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
-                        "Tweet posted to your account. </div>");
-                }
-
-            }
-        });
-    }
-    setTimeout(ajaxFctn, 3000);
-}
-
 /*Display field error*/
-function err(sel) {
-    $pDiv = $(sel).parent();
+var err = function(sel) {
+    var $pDiv = $(sel).parent();
     $pDiv.append("<span class=\"glyphicon glyphicon-remove form-control-feedback\"></span>");
     $pDiv.fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
-    $gpDiv = $pDiv.parent();
+    var $gpDiv = $pDiv.parent();
     $gpDiv.addClass("has-error");
 
-}
+};
 
 /*Handle login*/
-$("#loginModal").delegate("#login", 'click', function(event) {
+$("#loginModal").delegate("#login", "click", function(event) {
 
     event.preventDefault();
     var username, passwrd;
@@ -305,16 +305,15 @@ $("#loginModal").delegate("#login", 'click', function(event) {
             dataType: "json",
             contentType: "application/json",
             success: function(logindata) {
-                session = logindata.data;
+                var session = logindata.data;
                 session.members = logindata.total;
 
-                limit = Math.ceil(session.members / 2);
+                var limit = Math.ceil(session.members / 2);
                 console.log("Limit login: " + limit);
 
                 console.log("Total users: " + session.members);
                 $("#loginModal").modal("hide");
-                loginname = session.user_name;
-                loginuser = session.id;
+                var loginname = session.user_name;
 
                 $("a#user").append(" " + loginname + "!");
 
@@ -323,7 +322,7 @@ $("#loginModal").delegate("#login", 'click', function(event) {
 
                 $(".heading").removeClass("hide");
 
-                $("button[type=submit]").prop('disabled', true);
+                $("button[type=submit]").prop("disabled", true);
 
                 loadTweets();
 
@@ -337,20 +336,20 @@ $("#loginModal").delegate("#login", 'click', function(event) {
     }
 });
 
-$("#loginModal, #signupModal").on('shown.bs.modal', function() {
-    $('.focusOnOpen').focus();
+$("#loginModal, #signupModal").on("shown.bs.modal", function() {
+    $(".focusOnOpen").focus();
 });
 
 $(".goToNext").keyup(function(event) {
-    if (event.keyCode == 13) {
+    if (event.keyCode === 13) {
         $("#login, #newSignUp").click();
     }
 });
 
 
 /*Disable and enable submit button by checking the textarea contents*/
-$('#tweet').keyup(function() {
-    $("button[type=submit]").prop('disabled', this.value == "" ? true : false);
+$("#tweet").keyup(function() {
+    $("button[type=submit]").prop("disabled", this.value === "" ? true : false);
 });
 
 /*Remove field errors on keypress*/
@@ -362,8 +361,8 @@ $("input").on("click keypress", function() {
 });
 
 /*Clear modal on close*/
-$('.modal').on('hidden.bs.modal', function() {
-    $(this).find('form')[0].reset();
+$(".modal").on("hidden.bs.modal", function() {
+    $(this).find("form")[0].reset();
     $(this).find("div.has-error").removeClass("has-error");
     $("span.glyphicon-remove").remove();
     $(".alert").addClass("hide");
@@ -440,7 +439,7 @@ $("#logout").on("click", function() {
     $(".loginDone").addClass("hide");
     $(".userArea").addClass("hide");
     $("#post").html("");
-    $.get("http://localhost:8000/logout", function(data) {
+    $.get("http://localhost:8000/logout", function() {
         location.reload();
     });
 });
