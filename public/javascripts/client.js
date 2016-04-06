@@ -1,103 +1,97 @@
 var session;
 var limit;
 
-$(document).ready(function(){
-    $.get( "http://localhost:8000/checkSession", function( data ) {
+$(document).ready(function() {
+    $.get("http://localhost:8000/checkSession", function(data) {
 
-       if(data !=="new"){
-           session=data.user;
-           session.members = data.members;
-           console.log("members: "+session.members);
+        if (data !== "new") {
+            session = data.user;
+            session.members = data.members;
+            console.log("members: " + session.members);
 
-           limit = Math.ceil(session.members/2);
-           console.log("Limit checksession: "+limit);
+            limit = Math.ceil(session.members / 2);
+            console.log("Limit checksession: " + limit);
 
-           $("a#user").append(" "+session.user_name+"!");
-           $(".firstTask").addClass("hide");
-           $(".loginDone").removeClass("hide");
-           $("button[type=submit]").prop('disabled',true);
+            $("a#user").append(" " + session.user_name + "!");
+            $(".firstTask").addClass("hide");
+            $(".loginDone").removeClass("hide");
+            $("button[type=submit]").prop('disabled', true);
 
-           loadTweets();
-       }
+            loadTweets();
+        }
     });
 });
 
 
 /*Add user's new post*/
-$("#tweetPost").submit(function(event){
+$("#tweetPost").submit(function(event) {
 
-    event.preventDefault();             /**Ketul**/
+    event.preventDefault(); /**Ketul**/
 
-    var tweet=$("#tweet").val();
-    var data={
-        "tweet":tweet,
-        "username":session.user_name,
-        "userid":session.id
+    var tweet = $("#tweet").val();
+    var data = {
+        "tweet": tweet,
+        "username": session.user_name,
+        "userid": session.id
     };
 
     $.ajax({
         url: "http://localhost:8000/tweet",
         type: "POST",
         data: data,
-        dataType:"json",
-        success: function (postData) {
+        dataType: "json",
+        success: function(postData) {
 
             $("#tweet").val("");
-            $("button[type=submit]").prop('disabled',true);
+            $("button[type=submit]").prop('disabled', true);
             $("#postsAlert .alert").addClass("hide");
 
-            var likearr=postData.like;
-            upcount=likearr.length;
+            var likearr = postData.like;
+            upcount = likearr.length;
 
-            var dislikearr=postData.dislike;
-            dcount=dislikearr.length;
+            var dislikearr = postData.dislike;
+            dcount = dislikearr.length;
 
-            displayName(postData.id,postData.content,postData.user,postData.date,upcount,0,"up");
+            displayName(postData.id, postData.content, postData.user, postData.date, upcount, 0, "up");
         }
     });
 });
 
 /*load all user posts*/
-function loadTweets()
-{
+function loadTweets() {
     var countFlag = false;
-    var ajaxFn = function(){
+    var ajaxFn = function() {
         $.ajax({
-            url: "http://localhost:8000/loadTweets",     
+            url: "http://localhost:8000/loadTweets",
             type: "GET",
-            dataType:"json",
-            success: function (postData) {
+            dataType: "json",
+            success: function(postData) {
                 $("div#posts").html("");
                 $(".userArea").removeClass("hide");
 
-                loginuser="";
-                loginuser+=session.id;
+                loginuser = "";
+                loginuser += session.id;
                 postData.forEach(function(postData) {
 
-                    if(postData.approved == false) {
+                    if (postData.approved == false) {
                         countFlag = true;
-                        var likearr=postData.like;
-                        upcount=likearr.length;
+                        var likearr = postData.like;
+                        upcount = likearr.length;
 
-                        var dislikearr=postData.dislike;
-                        dcount=dislikearr.length;
+                        var dislikearr = postData.dislike;
+                        dcount = dislikearr.length;
 
-                        if(likearr.indexOf(loginuser)!==-1)
-                        {
-                            var updown="up";
+                        if (likearr.indexOf(loginuser) !== -1) {
+                            var updown = "up";
+                        } else if (dislikearr.indexOf(loginuser) !== -1) {
+                            var updown = "down";
+                        } else {
+                            var updown = "no";
                         }
-                        else if(dislikearr.indexOf(loginuser)!==-1)
-                        {
-                            var updown="down";
-                        }
-                        else
-                        {
-                            var updown="no";
-                        }
-                        displayName(postData.id,postData.content,postData.user,postData.date,upcount,dcount,updown);
+                        displayName(postData.id, postData.content, postData.user, postData.date, upcount, dcount, updown);
                     }
                 });
-                if(countFlag==false){
+                if (countFlag == false) {
                     $("#postsAlert .alert").text("Currently, there are no posts to show.");
                     $("#postsAlert .alert").removeClass("hide");
                 }
@@ -109,36 +103,36 @@ function loadTweets()
 }
 
 /*Display posts with upvote, downvote*/
-function displayName(id, tweet, user, date, up, down, upNoDown){
+function displayName(id, tweet, user, date, up, down, upNoDown) {
 
     var label1, label2;
-    var labelupActive = "<label class=\"btn btn-default up active\">";     
+    var labelupActive = "<label class=\"btn btn-default up active\">";
     var labelDownActive = "<label class=\"btn btn-default down active\">"
     var labelUp = "<label class=\"btn btn-default up\">";
     var labelDown = "<label class=\"btn btn-default down \">";
 
     /*if user has upvoted the post, then set class = active to label to keep button selected.*/
-    if(upNoDown==="up"){
+    if (upNoDown === "up") {
         label1 = labelupActive;
         label2 = labelDown;
     }
     /*if user has downvoted the post, then set class = active to label to keep button selected.*/
-    else if(upNoDown==="down"){
+    else if (upNoDown === "down") {
         label1 = labelUp;
         label2 = labelDownActive;
     }
     /*not yet upvoted/downvoted.Both buttons unselected*/
-    else{
+    else {
         label1 = labelUp;
         label2 = labelDown;
     }
 
-    var post = "<div id=\""+(id)+"\" class=\"post-preview \"> <h2 class=\"post-title\">"+tweet+" </h2> <p class=\"post-meta\">" +
-        "Posted by <span class=\"username\">"+user+"</span> on <span class=\"date\">"+date+"</span></p> <div class=\"btn-group btn-group-sm upDown\" " +
-        "data-toggle=\"buttons\">"+label1+"<input type=\"radio\" class= \"up\" autocomplete=\"off\"> " +
-        "<span class=\"glyphicon glyphicon-thumbs-up up\" aria-hidden=\"true\"></span><span class=\"up upvotes\">"+up+"</span>" +
-        " </label>"+label2+" <input type=\"radio\" class = \"down\" autocomplete=\"off\"><span class=\"glyphicon glyphicon-thumbs-down down\" aria-hidden=\"true\"></span></span><span class=\"down downvotes\">"
-        +down+"</span> </label> </div><hr></div> ";
+    var post = "<div id=\"" + (id) + "\" class=\"post-preview \"> <h2 class=\"post-title\">" + tweet + " </h2> <p class=\"post-meta\">" +
+        "Posted by <span class=\"username\">" + user + "</span> on <span class=\"date\">" + date + "</span></p> <div class=\"btn-group btn-group-sm upDown\" " +
+        "data-toggle=\"buttons\">" + label1 + "<input type=\"radio\" class= \"up\" autocomplete=\"off\"> " +
+        "<span class=\"glyphicon glyphicon-thumbs-up up\" aria-hidden=\"true\"></span><span class=\"up upvotes\">" + up + "</span>" +
+        " </label>" + label2 + " <input type=\"radio\" class = \"down\" autocomplete=\"off\"><span class=\"glyphicon glyphicon-thumbs-down down\" aria-hidden=\"true\"></span></span><span class=\"down downvotes\">" +
+        down + "</span> </label> </div><hr></div> ";
 
     /*prepend to show the latest post on top*/
     $("#posts").prepend(post);
@@ -146,82 +140,78 @@ function displayName(id, tweet, user, date, up, down, upNoDown){
 }
 
 /*Handle upvote downvote functionality*/
-$("#posts").delegate("label", "click",function(e) {
+$("#posts").delegate("label", "click", function(e) {
 
     var target = $(e.target);
     var lab = target.closest("label");
 
-    if(lab.hasClass("active"))
+    if (lab.hasClass("active"))
         console.log("already selected");
-    else
-    {
-        var like=0;
+    else {
+        var like = 0;
         var $div = target.closest("div.post-preview");
         var id = $div.attr("id");
 
-        var up=0;
-        var down=0;
-        var likearr=[];
-        var dislikearr=[];
+        var up = 0;
+        var down = 0;
+        var likearr = [];
+        var dislikearr = [];
 
         $.ajax({
-            url: "http://localhost:8000/getVotes?id="+id,
+            url: "http://localhost:8000/getVotes?id=" + id,
             type: "GET",
-            dataType:"json",
-            success: function (postData) {
+            dataType: "json",
+            success: function(postData) {
 
-                likearr=postData.like;
+                likearr = postData.like;
 
-                dislikearr=postData.dislike;
+                dislikearr = postData.dislike;
 
-                var usern="";
-                usern+=session.id;
+                var usern = "";
+                usern += session.id;
 
 
-                if(target.hasClass("up")) {
+                if (target.hasClass("up")) {
 
-                    if(dislikearr.indexOf(usern)!==-1)
-                    {
+                    if (dislikearr.indexOf(usern) !== -1) {
                         dislikearr.splice(dislikearr.indexOf(usern), 1);
                     }
                     likearr.push(usern);
 
-                    up=likearr.length;
-                    down=dislikearr.length;
+                    up = likearr.length;
+                    down = dislikearr.length;
 
                     $div.find("span.upvotes").text(up);
                     $div.find("span.downvotes").text(down);
 
-                    postData.like=likearr;
-                    postData.dislike=dislikearr;
+                    postData.like = likearr;
+                    postData.dislike = dislikearr;
 
-                    if(up == limit){
+                    if (up == limit) {
                         postData.approved = true;
                     }
                     updatePost(postData);
-                }
-                else if(target.hasClass("down")){
+                } else if (target.hasClass("down")) {
 
-                    var usern="";
-                    usern+=session.id;
+                    var usern = "";
+                    usern += session.id;
 
-                    if(likearr.indexOf(usern)!==-1)
-                    {
+                    if (likearr.indexOf(usern) !== -1) {
                         likearr.splice(likearr.indexOf(usern), 1);
                     }
                     dislikearr.push(usern);
 
-                    up=likearr.length;
-                    down=dislikearr.length;
+                    up = likearr.length;
+                    down = dislikearr.length;
 
                     $div.find("span.upvotes").text(up);
                     $div.find("span.downvotes").text(down);
 
-                    postData.like=likearr;
-                    postData.dislike=dislikearr;
+                    postData.like = likearr;
+                    postData.dislike = dislikearr;
 
 
-                    if(up === limit){
+                    if (up === limit) {
                         postData.approved = true;
                     }
                     updatePost(postData);
@@ -232,19 +222,17 @@ $("#posts").delegate("label", "click",function(e) {
     }
 });
 
-function updatePost(data)
-{
+function updatePost(data) {
     $.ajax({
         url: "http://localhost:8000/updatePost",
         type: "POST",
         contentType: "application/json",
-        data:JSON.stringify(data),
+        data: JSON.stringify(data),
         dataType: "json",
-        success: function (updatedData) {
-            var count=(updatedData.like).length;
+        success: function(updatedData) {
+            var count = (updatedData.like).length;
 
-            if(count===limit)
-            {
+            if (count === limit) {
                 postTweet(updatedData.content, updatedData.id);
 
             }
@@ -253,21 +241,22 @@ function updatePost(data)
 }
 
 /*Upload post to twitter*/
-function postTweet(tweet,postId)
-{
-    var data={"tweet":tweet};
-    console.log("Inside postTweet client.js Tweet:"+tweet);
+function postTweet(tweet, postId) {
+    var data = {
+        "tweet": tweet
+    };
+    console.log("Inside postTweet client.js Tweet:" + tweet);
 
-    var ajaxFctn = function(){
+    var ajaxFctn = function() {
         $.ajax({
             url: "http://localhost:8000/postTwitter",
             type: "POST",
             contentType: "application/json",
-            data:JSON.stringify(data),
+            data: JSON.stringify(data),
             dataType: "json",
-            success: function (updatedData) {
-                if(updatedData.success == true){
-                    var select = "#"+postId;
+            success: function(updatedData) {
+                if (updatedData.success == true) {
+                    var select = "#" + postId;
                     $(select).html("<div class=\"alert alert-success alert-dismissible\" role=\"alert\"> " +
                         "<button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">" +
                         "<span aria-hidden=\"true\">&times;</span></button> <strong>Great!</strong> " +
@@ -281,7 +270,7 @@ function postTweet(tweet,postId)
 }
 
 /*Display field error*/
-function err(sel){
+function err(sel) {
     $pDiv = $(sel).parent();
     $pDiv.append("<span class=\"glyphicon glyphicon-remove form-control-feedback\"></span>");
     $pDiv.fadeIn(100).fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
@@ -291,18 +280,16 @@ function err(sel){
 }
 
 /*Handle login*/
-$("#loginModal").delegate("#login",'click', function (event) {
+$("#loginModal").delegate("#login", 'click', function(event) {
 
     event.preventDefault();
     var username, passwrd;
-    if( !$("#user-name").val()) {
+    if (!$("#user-name").val()) {
         err("#user-name");
-    }
-    else if(!$("#password").val()){
+    } else if (!$("#password").val()) {
         err("#password");
 
-    }
-    else {
+    } else {
         username = $("#user-name").val();
         passwrd = $("#password").val();
 
@@ -315,59 +302,59 @@ $("#loginModal").delegate("#login",'click', function (event) {
             url: "http://localhost:8000/login",
             type: "POST",
             data: JSON.stringify(data),
-            dataType:"json",
+            dataType: "json",
             contentType: "application/json",
-            success: function(logindata){
-                session=logindata.data;
+            success: function(logindata) {
+                session = logindata.data;
                 session.members = logindata.total;
 
-                limit = Math.ceil(session.members/2);
-                console.log("Limit login: "+limit);
+                limit = Math.ceil(session.members / 2);
+                console.log("Limit login: " + limit);
 
-                console.log("Total users: "+session.members);
+                console.log("Total users: " + session.members);
                 $("#loginModal").modal("hide");
-                loginname=session.user_name;
-                loginuser=session.id;
+                loginname = session.user_name;
+                loginuser = session.id;
 
-                $("a#user").append(" "+loginname+"!");
+                $("a#user").append(" " + loginname + "!");
 
                 $(".firstTask").addClass("hide");
                 $(".loginDone").removeClass("hide");
 
                 $(".heading").removeClass("hide");
 
-                $("button[type=submit]").prop('disabled',true);
+                $("button[type=submit]").prop('disabled', true);
 
                 loadTweets();
 
             },
-            error: function(data){
+            error: function(data) {
                 $(".alert").removeClass("hide");
-                console.log("error: "+data);
+                console.log("error: " + data);
 
             }
         });
     }
 });
 
-$("#loginModal, #signupModal").on('shown.bs.modal', function () {
+$("#loginModal, #signupModal").on('shown.bs.modal', function() {
     $('.focusOnOpen').focus();
 });
 
-$(".goToNext").keyup(function(event){
-    if(event.keyCode == 13){
+$(".goToNext").keyup(function(event) {
+    if (event.keyCode == 13) {
         $("#login, #newSignUp").click();
     }
 });
 
 
 /*Disable and enable submit button by checking the textarea contents*/
-$('#tweet').keyup(function(){
+$('#tweet').keyup(function() {
     $("button[type=submit]").prop('disabled', this.value == "" ? true : false);
 });
 
 /*Remove field errors on keypress*/
-$("input").on("click keypress", function(){
+$("input").on("click keypress", function() {
     /*$(this).parent().parent().removeClass("has-error");*/
     $("div.has-error").removeClass("has-error");
     $("span.glyphicon-remove").remove();
@@ -375,7 +362,7 @@ $("input").on("click keypress", function(){
 });
 
 /*Clear modal on close*/
-$('.modal').on('hidden.bs.modal', function(){
+$('.modal').on('hidden.bs.modal', function() {
     $(this).find('form')[0].reset();
     $(this).find("div.has-error").removeClass("has-error");
     $("span.glyphicon-remove").remove();
@@ -383,7 +370,7 @@ $('.modal').on('hidden.bs.modal', function(){
 });
 
 /*Handle new user sign-up*/
-$("#newSignUp").on("click", function(event){
+$("#newSignUp").on("click", function(event) {
 
     event.preventDefault();
     var newUser, newPass, cnfrmPass;
@@ -392,75 +379,68 @@ $("#newSignUp").on("click", function(event){
     newPass = $("#newUserPass").val();
     cnfrmPass = $("#cnfrmPass").val();
 
-    if(!newUser){
+    if (!newUser) {
         err("#newUserName");
-    }
-    else if(!newPass){
+    } else if (!newPass) {
         err("#newUserPass");
-    }
-    else if(!cnfrmPass){
+    } else if (!cnfrmPass) {
         err("#cnfrmPass");
-    }
-    else if($.isNumeric(newUser)) {
+    } else if ($.isNumeric(newUser)) {
         err("#newUserName");
         $("#signupAlert strong").text("Cannot have numeric values.");
         $("#signupAlert").removeClass("hide");
-    }
-    else if($.isNumeric(newPass)){
+    } else if ($.isNumeric(newPass)) {
         err("#newUserPass");
         $("#signupAlert strong").text("Cannot have numeric values.");
         $("#signupAlert").removeClass("hide");
-    }
-    else if(newPass !== cnfrmPass){
-            $("#signupAlert strong").text("Passwords do not match.");
-            $("#signupAlert").removeClass("hide");
-            err("#newUserPass");
-            err("#cnfrmPass");
-        }
-    else{
-            var data = {
-                "user_name": newUser,
-                "password": newPass
-            };
+    } else if (newPass !== cnfrmPass) {
+        $("#signupAlert strong").text("Passwords do not match.");
+        $("#signupAlert").removeClass("hide");
+        err("#newUserPass");
+        err("#cnfrmPass");
+    } else {
+        var data = {
+            "user_name": newUser,
+            "password": newPass
+        };
 
-            var ajaxF = function (){
-                $.ajax({
-                    url: "http://localhost:8000/register",
-                    type: "POST",
-                    data: data,
-                    dataType:"json",
-                    success: function (data) {
-                        console.log(data);
-                        console.log("in success"+data.id);
-                        if(data.id!== false){
-                            console.log("new user created. "+data.id);
-                            $("#signupModal").modal("hide");
-                        }
-                        else {
-                            console.log("Username is not available.");
-                            err("#newUserName");
-                            $("#signupAlert strong").text("Username is not available.");
-                            $("#signupAlert").removeClass("hide");
-                        }
-                    },
-                    error: function(error){
-                        console.log(error);
+        var ajaxF = function() {
+            $.ajax({
+                url: "http://localhost:8000/register",
+                type: "POST",
+                data: data,
+                dataType: "json",
+                success: function(data) {
+                    console.log(data);
+                    console.log("in success" + data.id);
+                    if (data.id !== false) {
+                        console.log("new user created. " + data.id);
+                        $("#signupModal").modal("hide");
+                    } else {
+                        console.log("Username is not available.");
+                        err("#newUserName");
+                        $("#signupAlert strong").text("Username is not available.");
+                        $("#signupAlert").removeClass("hide");
                     }
-                });
-            };
-            setTimeout(ajaxF, 3000);
-        }
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        };
+        setTimeout(ajaxF, 3000);
+    }
 
 
 });
 
-$("#logout").on("click", function(){
+$("#logout").on("click", function() {
 
     $(".firstTask").removeClass("hide");
     $(".loginDone").addClass("hide");
     $(".userArea").addClass("hide");
     $("#post").html("");
-    $.get( "http://localhost:8000/logout", function( data ) {
+    $.get("http://localhost:8000/logout", function(data) {
         location.reload();
     });
 });
