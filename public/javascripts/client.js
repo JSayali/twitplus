@@ -44,6 +44,7 @@ $("#tweetPost").submit(function(event){
 
             $("#tweet").val("");
             $("button[type=submit]").prop('disabled',true);
+            $("#postsAlert .alert").addClass("hide");
 
             var likearr=postData.like;
             upcount=likearr.length;
@@ -59,10 +60,10 @@ $("#tweetPost").submit(function(event){
 /*load all user posts*/
 function loadTweets()
 {
-    var timeout = 0;
+    var countFlag = false;
     var ajaxFn = function(){
         $.ajax({
-            url: "http://localhost:8000/loadTweets",     /*Ketul*/
+            url: "http://localhost:8000/loadTweets",     
             type: "GET",
             dataType:"json",
             success: function (postData) {
@@ -74,6 +75,7 @@ function loadTweets()
                 postData.forEach(function(postData) {
 
                     if(postData.approved == false) {
+                        countFlag = true;
                         var likearr=postData.like;
                         upcount=likearr.length;
 
@@ -95,6 +97,10 @@ function loadTweets()
                         displayName(postData.id,postData.content,postData.user,postData.date,upcount,dcount,updown);
                     }
                 });
+                if(countFlag==false){
+                    $("#postsAlert .alert").text("Currently, there are no posts to show.");
+                    $("#postsAlert .alert").removeClass("hide");
+                }
             }
         });
     }
@@ -106,7 +112,7 @@ function loadTweets()
 function displayName(id, tweet, user, date, up, down, upNoDown){
 
     var label1, label2;
-    var labelupActive = "<label class=\"btn btn-default up active\">";     /*Sayali*/
+    var labelupActive = "<label class=\"btn btn-default up active\">";     
     var labelDownActive = "<label class=\"btn btn-default down active\">"
     var labelUp = "<label class=\"btn btn-default up\">";
     var labelDown = "<label class=\"btn btn-default down \">";
