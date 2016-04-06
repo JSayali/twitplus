@@ -7,6 +7,8 @@
 .alert {
     display:inline-block;
     font-size: medium;
+    width: 100%;
+    text-align: center;
 }
 .post-title {
     text-overflow: clip;
