@@ -3,7 +3,7 @@ var limit;
 
 $(document).ready(function(){
     $.get( "http://localhost:8000/checkSession", function( data ) {
-       
+
        if(data !=="new"){
            session=data.user;
            session.members = data.members;
@@ -43,6 +43,8 @@ $("#tweetPost").submit(function(event){
         success: function (postData) {
 
             $("#tweet").val("");
+            $("button[type=submit]").prop('disabled',true);
+            
             var likearr=postData.like;
             upcount=likearr.length;
 
