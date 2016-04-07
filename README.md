@@ -56,18 +56,18 @@ Installation and Setup Instructions:
 1.	Download or clone the Twitter + repository from GitHub using the following URL: https://github.com/JSayali/twitplus
 2.  Download and install node.js 
 3.	Install all dependencies specified in the package.json file which are:
-•	body-parser
-•	cookie-parser
-•	debug
-•	express-session
-•	express
-•	jade
-•	morgan
-•	request
-•	serve-favicon
-•	twitter
+*	body-parser
+*	cookie-parser
+*	debug
+*	express-session
+*	express
+*	jade
+*	morgan
+*	request
+*	serve-favicon
+*	twitter
 
 4.	Run the application using the following commands:
-•	node app.js 
-•	cd databases then run json-server db.json
+*	node app.js 
+*	cd databases then run json-server db.json
 
