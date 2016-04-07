@@ -23,12 +23,12 @@ Project 1 – Spring 2016
 *	Hoxie, David Matthew
 
 ##
-Project Description:
+**Project Description:**
 ##
   Twitter+ is a web application that serves as a Twitter gateway for groups of people in companies, schools, departments, or anywhere else. It is a single web application with only one html file (index.html). It allow users to post a tweet to a specific Twitter account as a group. Each group member can add a post and each team member should vote either with an up vote or down vote. If the votes reach half or more of the group members, the post will be posted to the Twitter account directly. For the time being of this project, there is only one group and one Twitter account @cpsc473. All group member accounts created will be linked to this group and this Twitter account.
   
 ##
-Application functionalities:
+**Application functionalities:**
 *	Sign up to create a username and password.
 *	Sign in to access the account using username and password identified in the sign up process.
 *	A user can write a post that will be viewed to all group members.
@@ -41,7 +41,7 @@ Application functionalities:
 *	Logout of the application.
 
 ##
-Application Pre-requisites:
+**Application Pre-requisites:**
 ##
 1.	Node.js and npm.
 2.	Json-server module.
@@ -51,7 +51,7 @@ Application Pre-requisites:
 6.	Json-server running on port 3000 (Make sure the port is available).
 
 ##
-Installation and Setup Instructions:
+**Installation and Setup Instructions:**
 ##
 1.	Download or clone the Twitter + repository from GitHub using the following URL: https://github.com/JSayali/twitplus
 2.  Download and install node.js 
