@@ -5,7 +5,7 @@ Project 1 – Spring 2016
 
 
 
-**Twitter + **
+** Twitter + **
 
 
 
@@ -14,7 +14,7 @@ Project 1 – Spring 2016
 
 
 
-Section 1, Team 1 - “Acerbic Unseemliness”
+**Section 1, Team 1 - “Acerbic Unseemliness”**
 ##
 * Shah, Ketul Pankajkumar
 *	Alfayez, Sarah Fahad
