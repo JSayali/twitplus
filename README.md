@@ -39,14 +39,17 @@ Application functionalities:
 *	A Twitter embedded timeline for the account appears on the home page of the application to view the recent posts.  
 *	The application has session functionality that is when the user’s page is refreshed; the user will not be logged out.  
 *	Logout of the application.
+
 ##
 Application Pre-requisites:
+##
 1.	Node.js and npm.
 2.	Json-server module.
 3.	Git
 4.	Internet connection.
 5.	HTTP server running on port 8000 (Make sure the port is available).
 6.	Json-server running on port 3000 (Make sure the port is available).
+
 ##
 Installation and Setup Instructions:
 ##
@@ -63,6 +66,7 @@ Installation and Setup Instructions:
 •	request
 •	serve-favicon
 •	twitter
+
 4.	Run the application using the following commands:
 •	node app.js 
 •	cd databases then run json-server db.json
