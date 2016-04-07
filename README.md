@@ -24,6 +24,7 @@ Section 1, Team 1 - “Acerbic Unseemliness”
 
 ##
 Project Description:
+##
   Twitter+ is a web application that serves as a Twitter gateway for groups of people in companies, schools, departments, or anywhere else. It is a single web application with only one html file (index.html). It allow users to post a tweet to a specific Twitter account as a group. Each group member can add a post and each team member should vote either with an up vote or down vote. If the votes reach half or more of the group members, the post will be posted to the Twitter account directly. For the time being of this project, there is only one group and one Twitter account @cpsc473. All group member accounts created will be linked to this group and this Twitter account.
   
 ##
@@ -46,10 +47,11 @@ Application Pre-requisites:
 4.	Internet connection.
 5.	HTTP server running on port 8000 (Make sure the port is available).
 6.	Json-server running on port 3000 (Make sure the port is available).
-
+##
 Installation and Setup Instructions:
+##
 1.	Download or clone the Twitter + repository from GitHub using the following URL: https://github.com/JSayali/twitplus
-2.	2. Download and install node.js 
+2.  Download and install node.js 
 3.	Install all dependencies specified in the package.json file which are:
 •	body-parser
 •	cookie-parser
