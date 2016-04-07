@@ -2,82 +2,14 @@
   "users": [
     {
       "id": 1,
-      "user_name": "ketul",
-      "password": "ketul123"
+      "user_name": "adam",
+      "password": "adam123"
     },
     {
       "id": 2,
-      "user_name": "sayali",
-      "password": "sayali123"
-    },
-    {
-      "id": 3,
-      "user_name": "sarah",
-      "password": "sarah123"
-    },
-    {
-      "id": 4,
-      "user_name": "joe",
-      "password": "joe123"
-    },
-    {
-      "id": 5,
-      "user_name": "david",
-      "password": "david123"
+      "user_name": "test",
+      "password": "test123"
     }
   ],
-  "posts": [
-    {
-      "content": "demo tweet on 5th",
-      "user": "ketul",
-      "date": "November 23, 2013",
-      "approved": false,
-      "like": [
-        "1",
-        "4"
-      ],
-      "dislike": [
-        "2"
-      ],
-      "id": 2
-    },
-    {
-      "content": "Test",
-      "user": "ketul",
-      "date": "November 23, 2013",
-      "approved": false,
-      "like": [
-        "1",
-        "3"
-      ],
-      "dislike": [
-        "2"
-      ],
-      "id": 3
-    },
-    {
-      "content": "Hello all!",
-      "user": "sayali",
-      "date": "November 23, 2013",
-      "approved": true,
-      "like": [
-        "3",
-        "1",
-        "2"
-      ],
-      "dislike": [],
-      "id": 4
-    },
-    {
-      "content": "cpsc 473",
-      "user": "sayali",
-      "date": "April 5, 2016",
-      "approved": false,
-      "like": [],
-      "dislike": [
-        "2"
-      ],
-      "id": 5
-    }
-  ]
+  "posts": []
 }
