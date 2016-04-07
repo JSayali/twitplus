@@ -1,11 +1,11 @@
-CPSC 473 - Web Programming and Data Management
+**CPSC 473 - Web Programming and Data Management**
 ## 
 Section: 01
 Project 1 – Spring 2016
 
 
 
-Twitter +
+**Twitter + **
 
 
 
